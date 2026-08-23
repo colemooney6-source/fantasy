@@ -16,6 +16,11 @@ surfaces the best available pick for your team each round.
   search for whichever player was just taken and click "Mark drafted." The
   app tracks snake-draft order automatically and highlights when it's your
   turn.
+- **`client/api/`** — the same ESPN-fetching logic, adapted as Vercel
+  serverless functions, so the whole app (frontend + API) deploys as a
+  single Vercel project. This is what's used in production; `server/` is
+  kept around purely as a convenience for local development without needing
+  the Vercel CLI.
 
 ### Recommendation algorithm
 
@@ -53,6 +58,27 @@ npm run dev
 ```
 
 Then open http://localhost:5173.
+
+## Deploying to Vercel
+
+The `client/` folder is a self-contained Vercel project: `client/api/*.ts`
+becomes serverless functions automatically, and `client/vercel.json` handles
+the SPA rewrite so client-side routing works. No other config is needed.
+
+**Option A — Vercel dashboard (recommended for ongoing deploys on every push):**
+1. Go to [vercel.com/new](https://vercel.com/new) and import this GitHub repo.
+2. When it asks for the project's **Root Directory**, set it to `client`.
+   Vercel auto-detects the Vite framework preset from there.
+3. No environment variables are required. Click **Deploy**.
+4. Every future push to this branch (or whichever branch you set as
+   production) will auto-deploy.
+
+**Option B — Vercel CLI, from your own machine (requires `vercel login`):**
+```bash
+cd client
+npx vercel        # first run links/creates the project, deploys a preview
+npx vercel --prod # promotes to your production URL
+```
 
 ## Notes / caveats
 
