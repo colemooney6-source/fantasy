@@ -41,10 +41,10 @@ export interface DraftedPick {
 export const DEFAULT_ROSTER_SLOTS: RosterSlots = {
   QB: 1,
   RB: 2,
-  WR: 2,
+  WR: 3,
   TE: 1,
   FLEX: 1,
   "D/ST": 1,
-  K: 1,
+  K: 0,
   BENCH: 6,
 };
