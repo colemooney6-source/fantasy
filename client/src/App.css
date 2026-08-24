@@ -312,6 +312,21 @@ legend {
   color: var(--warn);
 }
 
+.bye-badge {
+  margin-left: 0.4rem;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(144, 150, 168, 0.18);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.bye-badge-warn {
+  background: rgba(224, 161, 60, 0.2);
+  color: var(--warn);
+}
+
 .draft-button {
   font-size: 0.8rem;
   padding: 0.35rem 0.6rem;
