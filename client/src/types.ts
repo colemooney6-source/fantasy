@@ -35,6 +35,8 @@ export interface DraftedPick {
   overallPick: number;
   round: number;
   pickInRound: number;
+  /** 1..numTeams — which team's slot was on the clock for this pick, snake order. */
+  teamSlot: number;
   byMe: boolean;
 }
 

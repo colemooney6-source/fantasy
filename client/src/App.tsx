@@ -48,12 +48,14 @@ export default function App() {
     if (!settings) return;
     setDrafted((prev) => {
       const overallPick = prev.length + 1;
+      const teamSlot = teamOnClock(overallPick, settings.numTeams);
       const pick: DraftedPick = {
         playerId: player.id,
         overallPick,
         round: round(overallPick, settings.numTeams),
         pickInRound: pickInRound(overallPick, settings.numTeams),
-        byMe: teamOnClock(overallPick, settings.numTeams) === settings.myPick,
+        teamSlot,
+        byMe: teamSlot === settings.myPick,
       };
       return [...prev, pick];
     });
