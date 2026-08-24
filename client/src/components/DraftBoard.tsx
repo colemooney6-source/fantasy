@@ -1,11 +1,14 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { DraftedPick, Player, Settings } from "../types";
 import { pickInRound, round, teamOnClock } from "../draft/pickMath";
 import { recommend } from "../draft/recommend";
+import LeagueTeams from "./LeagueTeams";
 import PickTracker from "./PickTracker";
 import PlayerList from "./PlayerList";
 import RecommendationPanel from "./RecommendationPanel";
 import RosterPanel from "./RosterPanel";
+
+type BoardView = "my-draft" | "league";
 
 interface Props {
   settings: Settings;
@@ -19,6 +22,8 @@ interface Props {
 const RECENT_WINDOW = 5;
 
 export default function DraftBoard({ settings, players, drafted, onDraftPlayer, onUndo, onReset }: Props) {
+  const [view, setView] = useState<BoardView>("my-draft");
+
   const playerById = useMemo(() => new Map(players.map((p) => [p.id, p])), [players]);
 
   const draftedIds = useMemo(() => new Set(drafted.map((d) => d.playerId)), [drafted]);
@@ -66,14 +71,39 @@ export default function DraftBoard({ settings, players, drafted, onDraftPlayer, 
         canUndo={drafted.length > 0}
       />
 
-      <div className="draft-board-grid">
-        <PlayerList players={available} onDraft={(p) => onDraftPlayer(p)} draftButtonLabel="Mark drafted" />
-
-        <div className="draft-board-sidebar">
-          <RecommendationPanel recommendations={recommendations} onDraft={handleDraft} isMyTurn={isMyTurn} />
-          <RosterPanel myRoster={myRoster} rosterSlots={settings.rosterSlots} />
-        </div>
+      <div className="board-view-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "my-draft"}
+          className={`board-view-tab${view === "my-draft" ? " board-view-tab-active" : ""}`}
+          onClick={() => setView("my-draft")}
+        >
+          My Draft
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "league"}
+          className={`board-view-tab${view === "league" ? " board-view-tab-active" : ""}`}
+          onClick={() => setView("league")}
+        >
+          League
+        </button>
       </div>
+
+      {view === "my-draft" ? (
+        <div className="draft-board-grid">
+          <PlayerList players={available} onDraft={(p) => onDraftPlayer(p)} draftButtonLabel="Mark drafted" />
+
+          <div className="draft-board-sidebar">
+            <RecommendationPanel recommendations={recommendations} onDraft={handleDraft} isMyTurn={isMyTurn} />
+            <RosterPanel myRoster={myRoster} rosterSlots={settings.rosterSlots} />
+          </div>
+        </div>
+      ) : (
+        <LeagueTeams settings={settings} players={players} drafted={drafted} />
+      )}
     </div>
   );
 }
