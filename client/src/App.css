@@ -433,3 +433,159 @@ legend {
   max-height: 30vh;
   overflow-y: auto;
 }
+
+/* Board view tabs */
+.board-view-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.board-view-tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.board-view-tab-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* League teams view */
+.league-teams-header h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+}
+
+.league-teams-header p {
+  margin: 0 0 1rem;
+}
+
+.league-teams-header code {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.85em;
+}
+
+.league-team-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.9rem;
+}
+
+.league-team-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+}
+
+.league-team-card-me {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.league-team-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.league-team-rank {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.league-team-name {
+  font-weight: 600;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.me-badge {
+  background: var(--accent);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+}
+
+.league-team-grade {
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.league-team-grade[data-tier="a"] {
+  color: var(--good);
+  border-color: var(--good);
+}
+
+.league-team-grade[data-tier="b"] {
+  color: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+.league-team-grade[data-tier="c"] {
+  color: var(--warn);
+  border-color: var(--warn);
+}
+
+.league-team-grade[data-tier="d"],
+.league-team-grade[data-tier="f"] {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.league-team-score {
+  font-size: 0.75rem;
+  width: 100%;
+}
+
+.league-team-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.league-team-slot-chip {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.league-team-roster {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  max-height: 18vh;
+  overflow-y: auto;
+}
