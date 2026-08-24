@@ -29,7 +29,7 @@ interface EspnPlayerEntry {
 const ESPN_BASE_URL = process.env.ESPN_BASE_URL ?? "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl";
 
 const PLAYERS_URL = (year: number) =>
-  `${ESPN_BASE_URL}/seasons/${year}/players?scoringPeriodId=0&view=players_wl`;
+  `${ESPN_BASE_URL}/seasons/${year}/players?scoringPeriodId=0&view=kona_player_info`;
 
 const TEAM_SCHEDULE_URL = (year: number) =>
   `${ESPN_BASE_URL}/seasons/${year}?view=proTeamSchedules`;
@@ -126,6 +126,12 @@ export async function fetchPlayers(year: number, scoring: ScoringType): Promise<
     })
     .filter((p): p is Player => p !== null)
     .sort((a, b) => a.rank - b.rank);
+
+  if (raw.length > 0 && players.length === 0) {
+    throw new Error(
+      "ESPN returned player data but none had rank info for this scoring format — their response shape may have changed.",
+    );
+  }
 
   playerCache.set(cacheKey, { value: players, expiresAt: Date.now() + CACHE_TTL_MS });
   return players;
