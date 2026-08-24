@@ -299,6 +299,12 @@ legend {
   border-bottom: 1px solid var(--border);
 }
 
+.player-table .col-stat {
+  width: 3.5rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .row-flag td:nth-child(2) {
   color: var(--warn);
 }

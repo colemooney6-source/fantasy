@@ -10,11 +10,22 @@ export interface Player {
   flexEligible: boolean;
   injuryStatus: string | null;
   byeWeek: number | null;
+  lastYearAvgPoints: number | null;
+  projectedAvgPoints: number | null;
 }
 
 interface EspnDraftRank {
   rank: number;
   auctionValue?: number;
+}
+
+interface EspnPlayerStat {
+  seasonId?: number;
+  scoringPeriodId?: number;
+  statSourceId?: number;
+  statSplitTypeId?: number;
+  appliedAverage?: number;
+  appliedTotal?: number;
 }
 
 interface EspnPlayerEntry {
@@ -24,6 +35,41 @@ interface EspnPlayerEntry {
   proTeamId: number;
   injuryStatus?: string;
   draftRanksByRankType?: Record<string, EspnDraftRank>;
+  stats?: EspnPlayerStat[];
+}
+
+// Best-effort extraction of a full-season average-points figure from a
+// player's `stats` array. ESPN's shape here is unconfirmed and undocumented
+// (see README) — any mismatch, missing array, or missing entry just yields
+// `null` rather than throwing, so a parsing surprise here can never drop a
+// player from the pool the way the players_wl incident did for rank.
+function findSeasonAvgPoints(
+  stats: EspnPlayerStat[] | undefined,
+  seasonId: number,
+  statSourceId: number,
+): number | null {
+  try {
+    if (!Array.isArray(stats) || stats.length === 0) return null;
+    const entry = stats.find(
+      (s) =>
+        s &&
+        s.seasonId === seasonId &&
+        s.statSourceId === statSourceId &&
+        s.statSplitTypeId === 0 &&
+        s.scoringPeriodId === 0,
+    );
+    if (!entry) return null;
+    if (typeof entry.appliedAverage === "number" && Number.isFinite(entry.appliedAverage)) {
+      return entry.appliedAverage;
+    }
+    if (typeof entry.appliedTotal === "number" && Number.isFinite(entry.appliedTotal)) {
+      return entry.appliedTotal / 17;
+    }
+    return null;
+  } catch (err) {
+    console.warn("Could not parse season avg points for a player, continuing without it:", err);
+    return null;
+  }
 }
 
 const ESPN_BASE_URL = process.env.ESPN_BASE_URL ?? "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl";
@@ -78,6 +124,12 @@ export async function fetchPlayers(year: number, scoring: ScoringType): Promise<
   const cached = playerCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.value;
 
+  // `filterStatsForTopScoringPeriodIds` is a best-effort addition asking ESPN
+  // to include full-season stat splits (this year + last year) on each player
+  // entry so we can read appliedAverage off `stats`. The exact encoding is
+  // unconfirmed (see README) — if ESPN ignores or rejects the extra key, the
+  // request/response shape for rank data is unaffected either way, and the
+  // points-parsing below just falls back to null.
   const filter = {
     players: {
       limit: 600,
@@ -85,6 +137,10 @@ export async function fetchPlayers(year: number, scoring: ScoringType): Promise<
         sortPriority: 1,
         sortAsc: true,
         value: scoring,
+      },
+      filterStatsForTopScoringPeriodIds: {
+        value: 2,
+        additionalValue: [`00${year}`, `00${year - 1}`],
       },
     },
   };
@@ -121,6 +177,8 @@ export async function fetchPlayers(year: number, scoring: ScoringType): Promise<
         flexEligible: FLEX_ELIGIBLE.has(position),
         injuryStatus: entry.injuryStatus ?? null,
         byeWeek: byeWeeks[entry.proTeamId] ?? null,
+        lastYearAvgPoints: findSeasonAvgPoints(entry.stats, year - 1, 0),
+        projectedAvgPoints: findSeasonAvgPoints(entry.stats, year, 1),
       };
       return player;
     })
