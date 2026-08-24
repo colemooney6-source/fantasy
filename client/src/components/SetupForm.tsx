@@ -42,7 +42,7 @@ export default function SetupForm({ onSubmit }: Props) {
   return (
     <div className="setup-screen">
       <form className="setup-form" onSubmit={handleSubmit}>
-        <h1>Fantasy Draft Helper</h1>
+        <h1>Disgusting brothers draft helper</h1>
         <p className="subtitle">Set up your league, then track picks live to get pick-by-pick recommendations.</p>
 
         <div className="field-row">
