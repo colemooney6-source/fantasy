@@ -54,6 +54,12 @@ export default function PlayerList({ players, onDraft, draftButtonLabel }: Props
               <th>Pos</th>
               <th>Team</th>
               <th>Bye</th>
+              <th className="col-stat" title="Last season's actual average fantasy points per week">
+                LY Avg
+              </th>
+              <th className="col-stat" title="This season's projected average fantasy points per week">
+                Proj
+              </th>
               <th></th>
             </tr>
           </thead>
@@ -72,6 +78,8 @@ export default function PlayerList({ players, onDraft, draftButtonLabel }: Props
                 <td>{p.position}</td>
                 <td>{p.team}</td>
                 <td>{p.byeWeek ?? "—"}</td>
+                <td className="col-stat">{p.lastYearAvgPoints != null ? p.lastYearAvgPoints.toFixed(1) : "—"}</td>
+                <td className="col-stat">{p.projectedAvgPoints != null ? p.projectedAvgPoints.toFixed(1) : "—"}</td>
                 <td>
                   <button type="button" className="draft-button" onClick={() => onDraft(p)}>
                     {draftButtonLabel}
@@ -81,7 +89,7 @@ export default function PlayerList({ players, onDraft, draftButtonLabel }: Props
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="empty-row">
+                <td colSpan={8} className="empty-row">
                   No players match.
                 </td>
               </tr>

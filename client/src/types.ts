@@ -9,6 +9,8 @@ export interface Player {
   flexEligible: boolean;
   injuryStatus: string | null;
   byeWeek: number | null;
+  lastYearAvgPoints: number | null;
+  projectedAvgPoints: number | null;
 }
 
 export interface RosterSlots {
