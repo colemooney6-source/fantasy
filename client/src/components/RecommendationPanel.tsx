@@ -16,6 +16,7 @@ export default function RecommendationPanel({ recommendations, onDraft, isMyTurn
             <div className="rec-header">
               <span className="rec-rank">#{rec.player.rank}</span>
               <span className="rec-name">{rec.player.name}</span>
+              {rec.player.byeWeek && <span className="bye-badge">Bye {rec.player.byeWeek}</span>}
               <span className="rec-pos">
                 {rec.player.position} · {rec.player.team}
               </span>
