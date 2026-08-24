@@ -2,3 +2,7 @@ node_modules/
 dist/
 *.log
 .DS_Store
+
+# Local git worktrees for background sub-agents (isolation:"worktree") -
+# ephemeral, never part of project source.
+.claude/worktrees/
