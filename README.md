@@ -59,6 +59,50 @@ npm run dev
 
 Then open http://localhost:5173.
 
+## My Team (in-season roster + news alerts) — local only
+
+A second tab, **My Team**, is for after your draft: manage your actual roster
+(starters/bench/IR), and get alerted when a rostered player's injury status
+changes so you know to consider swapping your bench.
+
+**This tab only works when you're running `server/` locally — it is not part
+of the Vercel deployment.** It's backed by a local SQLite file
+(`server/data/roster.db`, via Node's built-in `node:sqlite`, gitignored) and a
+scheduled background check that only makes sense on a machine you control —
+Vercel's serverless functions don't have persistent local disk, so this
+couldn't live there the way the draft helper does.
+
+- **Seeding your roster**: `cd server && npm run seed` seeds `roster.db` from
+  a real ESPN roster (edit the `ROSTER` array in `server/src/seed.ts` to
+  match yours, then delete `server/data/roster.db` and re-run to reseed —
+  it's a no-op if the table already has rows). From there, manage it entirely
+  in the app: search-and-add players, move them between starter slots /
+  bench / IR, or remove them.
+- **How matching works**: roster players are matched to live ESPN player
+  data by name (`server/src/rosterMatch.ts`) — exact match first, then last
+  name + first initial (handles ESPN's abbreviated names like "L. Jackson").
+  A player added via the in-app search is matched instantly, since it comes
+  straight from the live pool. An unmatched player shows an "UNMATCHED"
+  badge; matching retries automatically on the next scheduled check.
+- **The scheduled check** (`server/src/scheduler.ts` +
+  `server/src/rosterCheck.ts`) runs once on server startup and then every
+  `NEWS_CHECK_INTERVAL_MINUTES` (default 30) while `npm run dev` is running.
+  Each run re-fetches live player data and compares injury status against
+  what was last recorded per player — a *change* (not just any status)
+  creates an alert, so seeding or first-time matching never floods you with
+  alerts. You can also trigger a check on demand with the "Check for news
+  now" button.
+- **Alerts** are plain in-app notifications (no email/push) — check the tab
+  to see them. This was a deliberate v1 choice to avoid needing an external
+  email/push service and its own credentials; ask if you want that added
+  later.
+- **Future direction** (not built yet): uploading the whole league's rosters
+  to optimize matchups. The schema is already team-agnostic under the hood
+  (`roster_players` isn't tied to "you" specifically), so extending it to
+  multiple teams is a schema/UI addition, not a rewrite — but it's a real
+  chunk of new work (needs a way to identify each team, and league-vs-league
+  matchup logic) when you're ready for it.
+
 ## Deploying to Vercel
 
 The `client/` folder is a self-contained Vercel project: `client/api/*.ts`

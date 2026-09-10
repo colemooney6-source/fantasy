@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { fetchPlayers } from "./api";
 import { pickInRound, round, teamOnClock } from "./draft/pickMath";
 import DraftBoard from "./components/DraftBoard";
+import MyTeam from "./components/MyTeam";
 import SetupForm from "./components/SetupForm";
 import { clearDraft, loadDraft, saveDraft } from "./storage";
 import type { DraftedPick, Player, Settings } from "./types";
 import "./App.css";
 
+type AppMode = "draft" | "my-team";
+
 export default function App() {
+  const [mode, setMode] = useState<AppMode>("draft");
   const [settings, setSettings] = useState<Settings | null>(null);
   const [drafted, setDrafted] = useState<DraftedPick[]>([]);
   const [players, setPlayers] = useState<Player[] | null>(null);
@@ -73,14 +77,13 @@ export default function App() {
     setLoadError(null);
   }
 
-  if (!hydrated) return null;
-
-  if (!settings) {
-    return <SetupForm onSubmit={handleStart} />;
-  }
-
-  if (loading || !players) {
-    return (
+  let draftContent: React.ReactNode = null;
+  if (!hydrated) {
+    draftContent = null;
+  } else if (!settings) {
+    draftContent = <SetupForm onSubmit={handleStart} />;
+  } else if (loading || !players) {
+    draftContent = (
       <div className="status-screen">
         {loadError ? (
           <>
@@ -104,16 +107,38 @@ export default function App() {
         )}
       </div>
     );
+  } else {
+    draftContent = (
+      <DraftBoard
+        settings={settings}
+        players={players}
+        drafted={drafted}
+        onDraftPlayer={handleDraftPlayer}
+        onUndo={handleUndo}
+        onReset={handleReset}
+      />
+    );
   }
 
   return (
-    <DraftBoard
-      settings={settings}
-      players={players}
-      drafted={drafted}
-      onDraftPlayer={handleDraftPlayer}
-      onUndo={handleUndo}
-      onReset={handleReset}
-    />
+    <div className="app-shell">
+      <nav className="app-nav">
+        <button
+          type="button"
+          className={mode === "draft" ? "app-nav-tab app-nav-tab-active" : "app-nav-tab"}
+          onClick={() => setMode("draft")}
+        >
+          Draft Helper
+        </button>
+        <button
+          type="button"
+          className={mode === "my-team" ? "app-nav-tab app-nav-tab-active" : "app-nav-tab"}
+          onClick={() => setMode("my-team")}
+        >
+          My Team
+        </button>
+      </nav>
+      <div className="app-content">{mode === "my-team" ? <MyTeam /> : draftContent}</div>
+    </div>
   );
 }
